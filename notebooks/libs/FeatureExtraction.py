@@ -41,10 +41,11 @@ def seconds_to_string(time):
 def extract_author_text_dictionary_from_message_nodes(message_nodes):
     author_text_dictionary = {}
     for message_node in message_nodes:
-        text = message_node.xpath('./text')[0].text      
-        author_id = message_node.xpath('./author')[0].text
-   
-        author_text_dictionary.setdefault(author_id, []).append(text)
+        text_nodes = message_node.xpath('./text') 
+        author_nodes = message_node.xpath('./author')
+        
+        for author_node, text_node in zip(author_nodes, text_nodes):
+            author_text_dictionary.setdefault(author_node.text, []).append(text_node.text)
         
     return author_text_dictionary
 
@@ -156,21 +157,22 @@ def all_conversation_nodes_of_author(tree,author_id):
 #function makes average of another function result over all conversations of given author
 #argument funct is expexted to be a function(conversation,author_id) type, for example 
 # avg_time_between_message_lines_in_seconds_for_author_in_conversation
-def average_trough_all_conversations(tree,author_id,funct):
-    conversations=all_conversation_nodes_of_author(tree,author_id)
+def average_trough_all_conversations(author_id, conversations, funct):
     results=[funct(c,author_id) for c in conversations]
     return sum(results)/len(results)
 
-def extract_conversation_nodes_as_list_from_parsed_text(xml):
-    return parsed_text.xpath('/conversations/conversation')
+def extract_conversation_nodes_as_list_from_xml(xml):
+    return xml.xpath('/conversations/conversation')
 
 
 def extract_author_conversation_node_dictionary_from_XML(xml):
-    conversation_nodes = extract_conversation_nodes_as_list_from_parsed_text(xml)
+    conversation_nodes = extract_conversation_nodes_as_list_from_xml(xml)
     author_text_dictionary = {}
     for conversation_node in conversation_nodes:
-        author_id = conversation_node.xpath('./message/author')[0].text       
-        author_text_dictionary.setdefault(author_id, []).append(conversation_node)
+        author_nodes = conversation_node.xpath('./message/author')
+        for author_node in author_nodes:
+            if conversation_node not in author_text_dictionary.get(author_node.text, []):
+                author_text_dictionary.setdefault(author_node.text, []).append(conversation_node)
         
     return author_text_dictionary
 
