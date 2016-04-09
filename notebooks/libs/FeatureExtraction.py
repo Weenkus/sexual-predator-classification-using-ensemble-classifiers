@@ -161,8 +161,7 @@ def average_trough_all_conversations(tree,author_id,funct):
     results=[funct(c,author_id) for c in conversations]
     return sum(results)/len(results)
 
-
-def extract_conversation_nodes_as_list_from_parsed_text(parsed_text):
+def extract_conversation_nodes_as_list_from_parsed_text(xml):
     return parsed_text.xpath('/conversations/conversation')
 
 
