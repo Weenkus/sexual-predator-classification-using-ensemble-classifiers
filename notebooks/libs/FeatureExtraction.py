@@ -112,14 +112,13 @@ def avg_times_between_message_lines_for_all_authors_in_seconds(conversation):
 #returns average time in seconds between two proceeding lines in given conversation for given author_id
 def avg_time_between_message_lines_in_seconds_for_author_in_conversation(conversation,author_id):
     times=all_time_nodes_of_author_in_conversation(conversation,author_id)
-    if len(times)==0:
-        return None
-    return (parse_time(times[-1].text)-parse_time(times[0].text))/(len(times)-1)
+    if len(times)-1==0:
+        return 0
+        
+    avg_time_past =  ((parse_time(times[-1])-parse_time(times[0]))/(len(times)-1))
+    seconds_in_the_day = 24*60*60
+    return avg_time_past if avg_time_past >= 0 else avg_time_past + seconds_in_the_day
 
-
-def conversation_length_in_seconds(conversation,autor_id=None):
-    times=all_time_nodes_in_conversation(conversation)
-    return (parse_time(last_time_node_in_conversation(conversation).text)-parse_time(first_time_node_in_conversation(conversation).text))
 
 
 def percentage_of_lines_in_conversation(conversation,author_id):
@@ -159,7 +158,7 @@ def all_conversation_nodes_of_author(tree,author_id):
 # avg_time_between_message_lines_in_seconds_for_author_in_conversation
 def average_trough_all_conversations(author_id, conversations, funct):
     results=[funct(c,author_id) for c in conversations]
-    return sum(results)/len(results)
+    return sum(results)*1.0/len(results)
 
 def extract_conversation_nodes_as_list_from_xml(xml):
     return xml.xpath('/conversations/conversation')
