@@ -1,0 +1,173 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "import scipy\n",
+    "import sys\n",
+    "from lxml import etree\n",
+    "sys.path.insert(0, '../notebooks/libs/')\n",
+    "import FeatureExtraction as FE"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "pathToFile='../../dataset/training/pan12-sexual-predator-identification-training-corpus-2012-05-01.xml'\n",
+    "tree=etree.parse(pathToFile)\n",
+    "razg=tree.xpath('/conversations/conversation')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "# returns time represented as seconds from hh:mm format\n",
+    "def parse_time(time_string):\n",
+    "    hh = time_string.split(\":\")[0];\n",
+    "    mm = time_string.split(\":\")[1];\n",
+    "    hh = int(hh)*3600;\n",
+    "    mm = int(mm)*60;\n",
+    "    return hh+mm;"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#returns the duration of given conversation, in seconds\n",
+    "def chat_duration(conversation): \n",
+    "    times=conversation.xpath('./message/time')\n",
+    "    start=parse_time(extract_text_between_tags(times[0]))\n",
+    "    end=parse_time(extract_text_between_tags(times[len(times)-1]))\n",
+    "    return end-start;"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "#converts time in seconds to string in hh:mm format\n",
+    "def seconds_to_string(time):\n",
+    "    str=\"\"\n",
+    "    hh = time/3600\n",
+    "    print hh\n",
+    "    mm = time/float(60)%60\n",
+    "    if(hh<10):\n",
+    "        str+=\"0{}\".format(hh)\n",
+    "    else:\n",
+    "        str+=\"{}\".format(hh)\n",
+    "    str+=\":\"\n",
+    "    if(mm<10):\n",
+    "        str+=\"0{}\".format(int(mm))\n",
+    "    else:\n",
+    "        str+=\"{}\".format(int(mm))\n",
+    "    return str"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "#ovo nije potrebno\n",
+    "def generator_author_and_conversation(dictionary):\n",
+    "    for key in dictionary:\n",
+    "        data = [dictionary.get(key)]\n",
+    "        data.insert(0,key)\n",
+    "        yield data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "rjecnik"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {
+    "collapsed": false
+   },
+   "outputs": [],
+   "source": [
+    "#\n",
+    "def make_tf_idf_matrix_from_XML(tree)\n",
+    "    message_node = FE.extract_message_nodes_as_list_from_parsed_text(tree)\n",
+    "    dictionary= FE.extract_author_text_dictionary_from_message_nodes(message_node)\n",
+    "    list_of_authors_strings = []\n",
+    "    for key in dictionary:\n",
+    "        list_of_authors_strings.append(' '.join(dictionary.get(key)))\n",
+    "    \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {
+    "collapsed": false
+   },
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.10"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}
