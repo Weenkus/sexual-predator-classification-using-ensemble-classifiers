@@ -1,6 +1,7 @@
 # coding: utf-8
 import scipy
 from lxml import etree
+import numpy
 
 
 # returns time represented as seconds from hh:mm format
@@ -24,7 +25,6 @@ def chat_duration(conversation):
 def seconds_to_string(time):
     str=""
     hh = time/3600
-    print hh
     mm = time/float(60)%60
     if(hh<10):
         str+="0{}".format(hh)
@@ -136,9 +136,9 @@ def message_texts_of_author_in_conversation(conversation,author_id):
 
 
 def percentage_of_characters_in_conversation(conversation,author_id):
-    authors_chars=''.join(messages_of_author_in_conversation(conversation,author_id))
-    all_chats=''.join(message_texts_in_conversation(conversation))
-    return len(authors_chars)*1.0/len(all_chats)
+    authors_chars=''.join(filter(None, message_texts_of_author_in_conversation(conversation,author_id)))
+    all_chats=''.join(filter(None, message_texts_in_conversation(conversation)))
+    return len(authors_chars)*1.0/len(all_chats) if len(all_chats) != 0 else 1
 
 
 def is_starting_conversation(conversation,author_id):
@@ -179,4 +179,44 @@ def extract_author_conversation_node_dictionary_from_XML(xml):
 def sexual_predator_ids(filePath):
     with open(filePath) as f:
         return f.read().splitlines()
+        
+ 
+def number_of_messages_sent_by_the_author(author, conversation_nodes):
+    number_of_conversations_sent_by_the_author = 0
+    for conversation_node in conversation_nodes:
+        author_nodes = conversation_node.xpath("./message/author")
+        for author_node in author_nodes:
+            number_of_conversations_sent_by_the_author += 1 if author_node.text == author else 0
+            
+    return number_of_conversations_sent_by_the_author
+ 
 
+def mean_time_of_messages_sent(author_id, conversation_nodes):
+    author_sent_message_times = []
+    for conversation_node in conversation_nodes:
+        times_of_author = all_time_nodes_of_author_in_conversation(conversation_node, author_id)
+        for time_of_author in times_of_author:
+            author_sent_message_times.append(time_of_author)
+            
+    if author_sent_message_times is not None:
+        seconds = []
+        for time in author_sent_message_times:
+            seconds.append(parse_time(time))
+
+        seconds.sort()
+        if seconds is not None:
+            return seconds[int(len(seconds)/2)]
+        else:
+            return 12*60*60
+    else:
+        return 12*60*60
+		
+    
+def number_of_characters_sent_by_the_author(author_id, conversation_nodes):
+    number_of_characters_sent_by_the_author = 0
+    for conversation_node in conversation_nodes:
+        messages_of_author = message_texts_of_author_in_conversation(conversation_node, author_id)
+        number_of_characters_sent_by_the_author += len(''.join(filter(None, messages_of_author)))
+            
+    return number_of_characters_sent_by_the_author
+		
