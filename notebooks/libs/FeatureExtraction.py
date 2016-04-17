@@ -205,11 +205,11 @@ def mean_time_of_messages_sent(author_id, conversation_nodes):
 
         seconds.sort()
         if seconds is not None:
-            return seconds_to_string(seconds[int(len(seconds)/2)])
+            return seconds[int(len(seconds)/2)]
         else:
-            return '12:00'
+            return 12*60*60
     else:
-        return '12:00'
+        return 12*60*60
 		
     
 def number_of_characters_sent_by_the_author(author_id, conversation_nodes):
