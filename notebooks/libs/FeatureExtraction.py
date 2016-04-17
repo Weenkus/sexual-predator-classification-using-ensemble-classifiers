@@ -136,7 +136,7 @@ def message_texts_of_author_in_conversation(conversation,author_id):
 
 
 def percentage_of_characters_in_conversation(conversation,author_id):
-    authors_chars=''.join(messages_of_author_in_conversation(conversation,author_id))
+    authors_chars=''.join(filter(None, message_texts_of_author_in_conversation(conversation,author_id)))
     all_chats=''.join(message_texts_in_conversation(conversation))
     return len(authors_chars)*1.0/len(all_chats)
 
@@ -181,7 +181,7 @@ def sexual_predator_ids(filePath):
         return f.read().splitlines()
         
  
- def number_of_messages_sent_by_the_author(author, conversation_nodes):
+def number_of_messages_sent_by_the_author(author, conversation_nodes):
     number_of_conversations_sent_by_the_author = 0
     for conversation_node in conversation_nodes:
         author_nodes = conversation_node.xpath("./message/author")
