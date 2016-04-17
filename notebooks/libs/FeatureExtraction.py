@@ -179,4 +179,14 @@ def extract_author_conversation_node_dictionary_from_XML(xml):
 def sexual_predator_ids(filePath):
     with open(filePath) as f:
         return f.read().splitlines()
+        
+ 
+ def number_of_messages_sent_by_the_author(author, conversation_nodes):
+    number_of_conversations_sent_by_the_author = 0
+    for conversation_node in conversation_nodes:
+        author_nodes = conversation_node.xpath("./message/author")
+        for author_node in author_nodes:
+            number_of_conversations_sent_by_the_author += 1 if author_node.text == author else 0
+            
+    return number_of_conversations_sent_by_the_author
 
