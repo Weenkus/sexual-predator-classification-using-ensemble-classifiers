@@ -229,7 +229,7 @@ def filter_words_from_dictionary(dictionary):
         text = dictionary.get(key)
         if None in text:
             continue
-        text = [x for x in text if len(x)<20]
+        text = [x for x in text if len(x)<10]
         text = [i for i in text if not regex1.search(i)]
         text = [i for i in text if not regex2.search(i)]
         dictionary[key] = text
