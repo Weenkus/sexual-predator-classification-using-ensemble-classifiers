@@ -2,7 +2,8 @@
 import scipy
 from lxml import etree
 import numpy
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+import re
 
 # returns time represented as seconds from hh:mm format
 def parse_time(time_string):
@@ -220,3 +221,32 @@ def number_of_characters_sent_by_the_author(author_id, conversation_nodes):
             
     return number_of_characters_sent_by_the_author
 		
+
+def filter_words_from_dictionary(dictionary):
+    regex1 = re.compile(r'(.)\1{5,}')
+    regex2 = re.compile(r'^[0-9]*$')
+    for key in dictionary:
+        text = dictionary.get(key)
+        if None in text:
+            continue
+        text = [x for x in text if len(x)<20]
+        text = [i for i in text if not regex1.search(i)]
+        text = [i for i in text if not regex2.search(i)]
+        dictionary[key] = text
+        
+
+#function returns author - term matrix 
+def make_tf_idf_matrix_from_XML(pathToFile):
+    tree=etree.parse(pathToFile)
+    message_node = extract_message_nodes_as_list_from_parsed_text(tree)
+    dictionary= extract_author_text_dictionary_from_message_nodes(message_node)
+    filter_words_from_dictionary(dictionary)
+    list_of_authors_strings = []
+    for key in dictionary:
+        tmp = dictionary.get(key)
+        if None in tmp:
+            continue
+        list_of_authors_strings.append(' '.join(dictionary.get(key)))
+    tfidf=TfidfVectorizer(stop_words='english',min_df=10)
+    
+    return tfidf.fit_transform(list_of_authors_strings), tfidf.get_feature_names(), list(dictionary.keys())
