@@ -236,17 +236,33 @@ def filter_words_from_dictionary(dictionary):
         
 
 #function returns author - term matrix 
-def make_tf_idf_matrix_from_XML(pathToFile):
-    tree=etree.parse(pathToFile)
+def make_tf_idf_matrix_from_XML(path_to_training, path_to_test):
+    tree=etree.parse(path_to_training)
     message_node = extract_message_nodes_as_list_from_parsed_text(tree)
     dictionary= extract_author_text_dictionary_from_message_nodes(message_node)
     filter_words_from_dictionary(dictionary)
-    list_of_authors_strings = []
+    
+    list_of_authors_strings_training = []
     for key in dictionary:
         tmp = dictionary.get(key)
         if None in tmp:
-            continue
-        list_of_authors_strings.append(' '.join(dictionary.get(key)))
+            dictionary[key]=''
+            
+        list_of_authors_strings_training.append(' '.join(dictionary.get(key)))
+    
+    tree=etree.parse(path_to_test)
+    message_node = extract_message_nodes_as_list_from_parsed_text(tree)
+    dictionary= extract_author_text_dictionary_from_message_nodes(message_node)
+    filter_words_from_dictionary(dictionary)
+    
+    list_of_authors_strings_test = []
+    for key in dictionary:
+        tmp = dictionary.get(key)
+        if None in tmp:
+            dictionary[key]=''
+            
+        list_of_authors_strings_test.append(' '.join(dictionary.get(key)))
+        
     tfidf=TfidfVectorizer(stop_words='english',min_df=10)
     
-    return tfidf.fit_transform(list_of_authors_strings), tfidf.get_feature_names(), list(dictionary.keys())
+    return tfidf.fit_transform(list_of_authors_strings_training), tfidf.transform(list_of_authors_strings_test)
