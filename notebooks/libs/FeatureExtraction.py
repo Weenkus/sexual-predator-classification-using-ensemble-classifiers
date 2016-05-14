@@ -2,7 +2,7 @@
 import scipy
 from lxml import etree
 import numpy
-from sklearn.feature_extraction.text import TfidfVectorizer
+
 import re
 
 # returns time represented as seconds from hh:mm format
@@ -234,35 +234,16 @@ def filter_words_from_dictionary(dictionary):
         text = [i for i in text if not regex2.search(i)]
         dictionary[key] = text
         
-
-#function returns author - term matrix 
-def make_tf_idf_matrix_from_XML(path_to_training, path_to_test):
-    tree=etree.parse(path_to_training)
+def prepare_for_tf_idf(path_to_dataset_xml,filter_before=True):
+    tree=etree.parse(path_to_dataset_xml)
     message_node = extract_message_nodes_as_list_from_parsed_text(tree)
     dictionary= extract_author_text_dictionary_from_message_nodes(message_node)
-    filter_words_from_dictionary(dictionary)
-    
-    list_of_authors_strings_training = []
-    for key in dictionary:
+    if filter_before:
+        filter_words_from_dictionary(dictionary) 
+    list_of_authors_strings = []
+    for key in sorted(dictionary):
         tmp = dictionary.get(key)
         if None in tmp:
             dictionary[key]=''
-            
-        list_of_authors_strings_training.append(' '.join(dictionary.get(key)))
-    
-    tree=etree.parse(path_to_test)
-    message_node = extract_message_nodes_as_list_from_parsed_text(tree)
-    dictionary= extract_author_text_dictionary_from_message_nodes(message_node)
-    filter_words_from_dictionary(dictionary)
-    
-    list_of_authors_strings_test = []
-    for key in dictionary:
-        tmp = dictionary.get(key)
-        if None in tmp:
-            dictionary[key]=''
-            
-        list_of_authors_strings_test.append(' '.join(dictionary.get(key)))
-        
-    tfidf=TfidfVectorizer(stop_words='english',min_df=10)
-    
-    return tfidf.fit_transform(list_of_authors_strings_training), tfidf.transform(list_of_authors_strings_test)
+        list_of_authors_strings.append(' '.join(dictionary.get(key)))
+    return list_of_authors_strings
