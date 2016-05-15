@@ -234,16 +234,29 @@ def filter_words_from_dictionary(dictionary):
         text = [i for i in text if not regex2.search(i)]
         dictionary[key] = text
         
-def prepare_for_tf_idf(path_to_dataset_xml,filter_before=True):
+def prepare_for_tf_idf(path_to_dataset_xml,filter_before=True,remove_silent=False,treshold=5):
     tree=etree.parse(path_to_dataset_xml)
     message_node = extract_message_nodes_as_list_from_parsed_text(tree)
     dictionary= extract_author_text_dictionary_from_message_nodes(message_node)
     if filter_before:
         filter_words_from_dictionary(dictionary) 
     list_of_authors_strings = []
+    if remove_silent:
+        dictionary=remove_silent_authors_from_dictionary(tree,dictionary,treshold)
     for key in sorted(dictionary):
         tmp = dictionary.get(key)
         if None in tmp:
             dictionary[key]=''
         list_of_authors_strings.append(' '.join(dictionary.get(key)))
     return list_of_authors_strings
+
+def remove_silent_authors_from_dictionary(tree,dictionary,treshold=5):
+    authors_conversations = extract_author_conversation_node_dictionary_from_XML(tree);
+    return dict((k, v) for k,v in dictionary.iteritems() if number_of_messages_sent_by_the_author(k,authors_conversations[k])>=treshold )
+    
+            
+def silent_author_ids(tree,treshold=5):
+    authors_conversations = extract_author_conversation_node_dictionary_from_XML(tree)
+    all_author_ids=authors_conversations.keys()
+    return [author_id for author_id in all_author_ids
+                    if number_of_messages_sent_by_the_author(author_id,authors_conversations[author_id])<treshold]
