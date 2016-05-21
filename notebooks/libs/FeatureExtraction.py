@@ -260,3 +260,61 @@ def silent_author_ids(tree,treshold=5):
     all_author_ids=authors_conversations.keys()
     return [author_id for author_id in all_author_ids
                     if number_of_messages_sent_by_the_author(author_id,authors_conversations[author_id])<treshold]
+                    
+                    
+def number_of_unique_authors_interacted_with(author, conversation_nodes):
+    author_ids = set()
+    for conversation_node in conversation_nodes:
+        authors = conversation_node.xpath('.//message//author')
+        author_ids |= set([author.text for author in authors])
+        
+    return len(author_ids) 
+    
+    
+def avg_number_of_unique_authors_interacted_with_per_chat(author, conversation_nodes):
+    avg_per_chat = []
+    for conversation_node in conversation_nodes:
+        authors = conversation_node.xpath('.//message//author')
+        avg_per_chat.append(len(set([author.text for author in authors])))
+        
+    return sum(avg_per_chat)/len(conversation_nodes)
+    
+    
+def difference_unique_authors_per_chat_and_total_unique(uniq_per_chat, total_unique):
+    return abs(uniq_per_chat - total_unique)
+    
+    
+def difference_unique_authors_and_conversations(total_unique, number_conversatio):
+    return abs(total_unique - number_conversatio)
+    
+    
+def avg_question_marks_per_conversation(author, conversation_nodes):
+    num_of_question_marks = []
+    for conversation_node in conversation_nodes:
+        count = 0
+        
+        if len(conversation_node.xpath('.//message//text')) == 0:
+            continue
+        
+        for message in message_texts_in_conversation(conversation_node):
+            if message is not None and '?' in message:
+                count += 1
+                
+        num_of_question_marks.append(count)
+        
+    return sum(num_of_question_marks)/len(conversation_nodes)
+    
+    
+def total_question_marks_per_conversation(author, conversation_nodes):
+    count = 0
+    for conversation_node in conversation_nodes:
+        
+        if len(conversation_node.xpath('.//message//text')) == 0:
+            continue
+        
+        for message in message_texts_in_conversation(conversation_node):
+            if message is not None and '?' in message:
+                count += 1
+        
+    return count
+    
