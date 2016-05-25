@@ -2,7 +2,8 @@
 import scipy
 from lxml import etree
 import numpy
-
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
 import re
 
 # returns time represented as seconds from hh:mm format
@@ -318,3 +319,109 @@ def total_question_marks_per_conversation(author, conversation_nodes):
         
     return count
     
+
+def total_authors_question_marks_per_conversation(author, conversation_nodes):
+    count = 0
+    for conversation_node in conversation_nodes:
+        
+        if len(conversation_node.xpath('.//message//text')) == 0:
+            continue
+        
+        for message in message_texts_of_author_in_conversation(conversation_node, author):
+            if message is not None and '?' in message:
+                count += 1
+        
+    return count
+    
+def calculate_author_conversation_sentiment_avg(author, conversation_nodes):
+    sentiment = {
+        'neg': 0.0,
+        'pos': 0.0,
+        'neu': 0.0,
+        'compound': 0.0 
+    }
+    
+    whole_text = ''
+    for conversation_node in conversation_nodes:
+        
+        if len(conversation_node.xpath('.//message//text')) == 0:
+            continue
+        
+        for message in message_texts_in_conversation(conversation_node):
+            if message is not None:
+                whole_text += message
+    
+        
+    sentences = nltk.tokenize.sent_tokenize(whole_text)
+    sentences.extend(sentences)
+
+    sid = nltk.sentiment.SentimentIntensityAnalyzer()
+    neg = []
+    pos = []
+    neu = []
+    compound = []
+    for sentence in sentences:
+
+        if sentence is None:
+            continue
+
+        sentiment = sid.polarity_scores(sentence)
+        neg.append(sentiment['neg'])
+        pos.append(sentiment['pos'])
+        neu.append(sentiment['neu'])
+        compound.append(sentiment['compound'])
+
+
+    return {
+        'neg': sum(neg)/len(neg) if len(neg) != 0 else 0.0,
+        'pos': sum(pos)/len(pos) if len(pos) != 0 else 0.0,
+        'neu': sum(neu)/len(neu) if len(neu) != 0 else 0.0,
+        'compound': sum(compound)/len(compound) if len(compound) != 0 else 0.0
+    }
+    
+def calculate_conversation_sentiment_total(author, conversation_nodes):
+    sentiment = {
+        'neg': 0.0,
+        'pos': 0.0,
+        'neu': 0.0,
+        'compound': 0.0 
+    }
+    whole_text = ''
+    
+    for conversation_node in conversation_nodes:
+        
+        if len(conversation_node.xpath('.//message//text')) == 0:
+            continue
+        
+        for message in message_texts_in_conversation(conversation_node):
+            
+            if message is not None:
+                whole_text += message
+
+        
+    sid = nltk.sentiment.SentimentIntensityAnalyzer()
+    return sid.polarity_scores(whole_text) if whole_text is not None or whole_text != '' else sentiment
+    
+    
+def calculate_author_conversation_sentiment_total(author, conversation_nodes):
+    sentiment = {
+        'neg': 0.0,
+        'pos': 0.0,
+        'neu': 0.0,
+        'compound': 0.0 
+    }
+    whole_text = ''
+    
+    for conversation_node in conversation_nodes:
+        
+        if len(conversation_node.xpath('.//message//text')) == 0:
+            continue
+        
+        for message in message_texts_of_author_in_conversation(conversation_node, author):
+            
+            if message is not None:
+                whole_text += message
+
+        
+    sid = nltk.sentiment.SentimentIntensityAnalyzer()
+    return sid.polarity_scores(whole_text) if whole_text is not None or whole_text != '' else sentiment
