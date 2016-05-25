@@ -390,8 +390,8 @@ def calculate_conversation_sentiment_total(author, conversation_nodes):
     
     for conversation_node in conversation_nodes:
         
-        if len(conversation_node.xpath('.//message//text')) == 0:
-            continue
+        #if len(conversation_node.xpath('.//message//text')) == 0:
+        #    continue
         
         for message in message_texts_in_conversation(conversation_node):
             
@@ -414,8 +414,8 @@ def calculate_author_conversation_sentiment_total(author, conversation_nodes):
     
     for conversation_node in conversation_nodes:
         
-        if len(conversation_node.xpath('.//message//text')) == 0:
-            continue
+        #if len(conversation_node.xpath('.//message//text')) == 0:
+        #    continue
         
         for message in message_texts_of_author_in_conversation(conversation_node, author):
             
@@ -425,3 +425,43 @@ def calculate_author_conversation_sentiment_total(author, conversation_nodes):
         
     sid = nltk.sentiment.SentimentIntensityAnalyzer()
     return sid.polarity_scores(whole_text) if whole_text is not None or whole_text != '' else sentiment
+
+
+def words_count_of_author(author, conversation_nodes, words_from_file):
+    whole_text = ''
+    for conversation_node in conversation_nodes:
+        
+        #if len(conversation_node.xpath('.//message//text')) == 0:
+        #   continue
+        
+        for message in message_texts_of_author_in_conversation(conversation_node, author):
+            
+            if message is not None:
+                whole_text += message
+                
+    words = whole_text.split(' ')
+    count = 0
+    for word in words:
+        if word in words_from_file:
+            count += 1
+    return count
+    
+def words_count_conversation(author, conversation_nodes, words_from_file):
+    whole_text = ''
+    
+    for conversation_node in conversation_nodes:
+        
+        #if len(conversation_node.xpath('.//message//text')) == 0:
+        #    continue
+        
+        for message in message_texts_in_conversation(conversation_node):
+            
+            if message is not None:
+                whole_text += message
+
+    words = whole_text.split(' ')
+    count = 0
+    for word in words:
+        if word in words_from_file:
+            count += 1
+    return count

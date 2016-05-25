@@ -1,0 +1,20 @@
+0	number of conversation	q
+1	percent of conversations started by the author	q
+2	difference between two preceding lines in seconds	q
+3	number of messages sent	q
+4	average percent of lines in conversation	q
+5	average percent of characters in conversation	q
+6	number of characters sent by the author	q
+7	mean time of messages sent	q
+8	number of unique contacted authors	q
+9	avg number of unique authors interacted with per conversation	q
+10	total unique authors and unique per chat difference	q
+11	conversation num and total unique authors difference	q
+12	average question marks per conversations	q
+13	total question marks	q
+14	total author question marks	q
+15	avg author question marks	q
+16	author and conversation quetsion mark differnece	q
+17	pos word count author	q
+18	neg word count author	q
+19	prof word count author	q
